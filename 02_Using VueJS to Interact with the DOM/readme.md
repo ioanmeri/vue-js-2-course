@@ -1,6 +1,6 @@
 # Using VueJS to Interact with the DOM
 
-## Template <=> Instance Basics
+## Outputting Data to Templates
 
 ### Understanding VueJS Templates
 VueJS creates a template based on the HTML code, stores that internally and uses this template to render the real HTML in the DOM
@@ -148,21 +148,37 @@ or chain them:
 ## Reactive Properties
 
 ### Writing Javascript Code In the Templates
-Simple JS statements can be evaluated in the templates
+A mixture of HTML and JS code
 
-**template expressions**
+At all the places, where you can access the Vue Instance, you can write any JS code. As long as it is:
+
+* One Expression
+* No if/for loop
+
+They are called: **template expressions**
+
 ```
 <button v-on:click="counter++">Click me</button>
 <p>{{ counter*2 }}</p>
 <p>{{ counter * 2 > 10 ? 'Greater than 10' : 'Smaller than 10' }}</p>
 ```
+[Example](https://codepen.io/ioanmeri/pen/xxxOvga)
 
 ### Using Two-Way-Binding
-**v-model** Directive
+**v-model** Directive => v-on + v-bind
+
+e.g.: If I have an input field with my name:
+
+  * I want to update the data property
+  * and update it, everywhere I output it in templates
+
+v-model tells VueJS, set up 2 way Data Binding
+
 ```
 <input type="text" v-model="name">
 ```
-* It will update the name property at the view instance
+[Example]()
+
 
 ### Reacting to Changes with Computed Properties
 The **problem**
@@ -196,18 +212,61 @@ new Vue({
 	* the result() that will execute here does use any of the properties
 	* the change of secondCounter influences the result method
 
+For computed properties, it is aware that output it is not interested in the secondCounter at all. 
 
 **For this case**:
 
 **computed**: Dependent Properties
 
-* Also allows us to store properties
+* Caching the result
+* only use the function if you know you don't want to cache the result
+
+#### Computed Properties are Better Understood with an Example
+
+[Example](https://codepen.io/ioanmeri/pen/WNNGedK)
+
+**Computed Props:** Only for Synchronous Operations 
+
+**Best Practice:** Use Computed properties wherever you can, due to caching
+
+### Watching for Changes
+**If you want asynchronous tasks to be run:**
+
+
+For **Dependencies**:
+
+  * Computed Properties
+    * Dependent Properties
+  * Watch object in Vue Instance
+    * Execute code upon data changes
 
 ```
-computed: 
+new Vue({
+  data: {
+    counter: 0
+  },
+  watch: {
+    counter: function(value){
+      var vm = this;
 
+      setTimeout(function(){
+        vm.counter = 0;
+      },2000)
+    } 
+  }
 
-<p>Result: {{ result() }} | {{ output  }}</p>
+  ...
+  })
 ```
+[Example](https://codepen.io/ioanmeri/pen/gOOwJKR)
 
-For computed properties, it is aware that output it is not interested in the secondCounter at all.
+### Saving Time With Shorthands
+Shorthands:
+
+* **v-on => @**
+* **v-bind => :**
+
+Vue JS will recognise them behind the scenes.
+
+### Assignment 3: Reactive Properties 
+https://codepen.io/ioanmeri/pen/oNNzROz
