@@ -270,3 +270,83 @@ Vue JS will recognise them behind the scenes.
 
 ### Assignment 3: Reactive Properties 
 https://codepen.io/ioanmeri/pen/oNNzROz
+
+
+## Styling
+
+### Dynamic Styling with CSS
+#### Basics
+
+How to change the styles. 
+
+  * Attach CSS classes.
+
+Although class is used 2 times, Vue JS will bind them together in one object.
+
+```
+  <div 
+       class="demo"
+       @click="attachRed = !attachRed"
+       :class="{red: attachRed}"></div>
+
+new Vue({
+  el: '#app',
+  data: {
+    attachRed: false
+  }
+})
+```
+
+[Example](https://codepen.io/ioanmeri/pen/VwwKoGO)
+
+#### Using Objects
+
+Use of computed property to return an object with multiple classes
+
+[Example](https://codepen.io/ioanmeri/pen/BaaLXEL)
+
+#### Using Names
+
+Calculate **which** class should be attached
+
+An array for :class can be used:
+
+```
+<div class="demo" :class="[color, {red: attachRed}]"></div>
+```
+
+[Example](https://codepen.io/ioanmeri/pen/RwwobPW)
+
+### Setting Styles Dynamically(without CSS Classes)
+
+_Dashes are not a proper character name: Use ' '_
+
+_Or use camelCase syntax_
+
+**Template**
+
+```
+<div class="demo" :style="{backgroundColor: color}"></div>
+<div class="demo" :style="myStyle"></div>
+<div class="demo" :style="[myStyle, {height: width + 'px'}]"></div>
+```
+
+**Instance**
+```
+new Vue({
+  el: '#app',
+  data: {
+    color: 'green',
+    width: 100
+  },
+  computed: {
+    myStyle: function(){
+      return {
+        backgroundColor: this.color,
+        width: this.width + 'px'
+      };
+    }
+  }
+})
+```
+
