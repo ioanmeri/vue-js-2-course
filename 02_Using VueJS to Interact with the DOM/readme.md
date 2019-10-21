@@ -350,3 +350,6 @@ new Vue({
 })
 ```
 
+### Assignment 4 - Styling
+
+[Solution](https://codepen.io/ioanmeri/pen/zYYoVgo)
