@@ -93,16 +93,37 @@ persons: [
 ]
 ```
 
+[Example](https://codepen.io/ioanmeri/pen/ZEELRQa)
+
 ### Keeping Track of Elements when using v-for
 ```
 <ul>
 	<li v-for="(ingredient, i) in ingredients">{{ ingredient }} ({{ i }})</li>
 </ul>
 <button @click="ingredients.push('spices')">Add New</button>
-  ```
+```
 
-It works as expected:
+**It works as expected but:**
 
 * The array doesn't change
 	* It's a reference type, and the pointer to the refence hasn't changed. Only the value in memory, but you would have to watch this value in memory
 * Vue JS does this automatically
+
+**How Vue JS updates the list?**
+
+* By updating the position in the array where something changed
+  * If you want to override the second element, Vue JS does not keep track of the specific element it created, it will only patch it the second position
+
+
+If you want to be **super safe** and make sure Vue JS is not only **aware** of the position but of the actual **list item**:
+
+* You need to assign a unique key
+
+```
+<li v-for="(ingredient, i) in ingredients" :key="ingredient">{{ ingredient }}</li>
+```
+**It means**
+
+* If Vue JS needs to reorder them, or something similar, it will take the actual element and reorder it
+* Not just override the values in some of the positions
+* If you encounter a bug with elements being in different places than expected, check if you are assigning a key.
