@@ -127,3 +127,6 @@ If you want to be **super safe** and make sure Vue JS is not only **aware** of t
 * If Vue JS needs to reorder them, or something similar, it will take the actual element and reorder it
 * Not just override the values in some of the positions
 * If you encounter a bug with elements being in different places than expected, check if you are assigning a key.
+
+## Assignment 5: Conditionals & Lists
+[Solution](https://codepen.io/ioanmeri/pen/gOOgjPR)
