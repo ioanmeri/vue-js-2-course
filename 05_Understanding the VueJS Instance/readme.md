@@ -84,7 +84,7 @@ Another way of accessing the data from outside:
 
 **vm1.$data.title** equals to **vm1.title**;
 
-and
+**Also:**
 
 ```
 var data = {
@@ -92,7 +92,53 @@ var data = {
 	showParagraph: false
 }
 ```
+The $data object stored in the Vue Instance, is still the data object we set up above
 
 ```
 console.log(vm1.$data === data); // true !!!
 ```
+
+You can create the **data** variable **before the VueJS Instance** and pass it as the value for the key value pair. 
+
+VueJS doesn't create it's own enclosed world. It's normal JS code and it's able to interact with the JS code around it.
+
+We can:
+
+* create normal JS code to populate our data
+* access the instance from outside
+* use the proxied properties of the Vue Instance from outside
+* use multiple Vue Instances
+* through normal JS code
+
+Generally, there is nothing wrong of mixing the normal JS code and VueJS code
+
+# Placing $refs and Using them on your Templates
+
+If I want to get the content of a button
+
+* In VanillaJS, we can use querySelector
+* In VueJS, ref attribute (by VueJS)
+
+```
+<button v-on:click="show" ref="myButton">Show Paragraph</button>
+```
+_i can register as many as i want with that ref key_
+
+In the Instance:
+
+In any method:
+```
+console.log(this.$refs);
+```
+
+Object{myButton: button}
+
+We can access:
+
+```
+console.log(this.$refs);
+```
+
+If you need to access a VueJS element, better use the ref than the querySelector
+
+
