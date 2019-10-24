@@ -224,3 +224,83 @@ There are 2 versions of VueJS
 * Re compiled version
 
 ## How VueJS Updates the DOM
+
+
+#### Change
+It's property we set up, has it's own watcher.
+
+VueJS when we pass a property to the constructor, creates theses watchers for all the properties in our data property. Thus allowing itself to watch for changes to these properties, which mean that it probably means to update something. 
+
+#### Update
+But, **it doesn't update just because it changed**
+
+JS is super fast, but **accessing the DOM is super slow**. We wanna do this, as seldom as possible.
+
+It has The Virtual DOM as a middleware, it's a representation of the real DOM. A copy parsed in JS, and therefore, very quick to be accessed.
+
+Vue Instance <----  Virtual DOM ------> DOM:
+
+* VueJS watches these changes, writes them to the VirtualDOM (if we update message for example)
+* It recreates this Virtual DOM (JS)
+* Check for Differences between "New" and "Old" Virtual DOM
+* And **only** updates **this part** in the Real DOM
+
+It knows which property did change, which part of the template is affected, what is the current state of the DOM (represented by the VirtualDOM)
+
+Since it also updated the Virtual DOM, it now automatically got an up to date representation of the Real DOM without having to take a full copy. VueJS contantly updates
+
+## The VueJS Instance Lifecycle
+
+What happens behind the scenes, when we create a **new Vue** Instance
+
+```
+new Vue({
+	el: '#app',
+	data: {
+		title: 'The VueJS Instance'
+	}
+});
+```
+> It takes a templates, and updates the DOM based on that template
+
+Behind the scenes, is more complex:
+
+* beforeCreate()
+* Intitialize Data & Events
+* Intance Created -> created()
+* Compile template or **el**'s template
+* beforeMount()
+* Replace **el** with compiled template
+* Mounted to DOM
+	* Data Changed
+	* beforeUpdate()
+	* Re-render DOM
+	* updated()
+	* Mounted to DOM
+* beforeDestroy()
+* Destroyed
+
+## The VueJS Instance Lifecycle in Practice
+
+**beforeCreate**, **created**, **beforeMount**, **mounted** methods are automatically called at refresh.
+
+**beforeUpdate** and **updated** are called after a piece of data have changed
+
+* If data property (title) hasn't changed, these methods are not called even if we force them to update. They update only when values have changed.  
+* Is the same value, hence no neeed to render anything, hence no need to call these methods!
+
+**beforeDestory** and **destroy** it removes all JS logic!
+
+
+[Example](https://codepen.io/ioanmeri/pen/gOOWray)
+
+
+
+
+
+
+
+
+
+
+
