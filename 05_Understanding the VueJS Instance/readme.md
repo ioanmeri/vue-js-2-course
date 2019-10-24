@@ -142,3 +142,85 @@ console.log(this.$refs);
 If you need to access a VueJS element, better use the ref than the querySelector
 
 
+[Example](https://codepen.io/ioanmeri/pen/pooeLzL)
+
+## More about the Vue API
+
+[Documentation](https://vuejs.org/v2/api/)
+
+
+## Mounting a Template
+remove the el: '#app' property
+
+use instead:
+```
+vm1.$mount('#app1');
+```
+
+**Pattern**
+
+The properties prefixed with **$** are the native VueJS methods and properties we can use.
+
+**$mount**:
+
+It's a method. It allows us to do the same with the el property.
+
+If we know where to mount it, use the el property (it is meant for).
+
+Use case, If you have configured and set up your Vue Instance but you don't know where to mount it.
+Configure it and pass it later.
+
+#### Create our own template inside the Vue Instance
+```
+var vm3 = new Vue({
+	template: '<h1>Hello!</h1>'
+});
+
+vm3.$mount('#app3');
+```
+OR
+
+```
+vm3.$mount(); // will render it, create it off screeen
+document.getElementById('app3').appendChild(vm3.$el);
+```
+
+## Using Components
+
+Use a template in multiple places
+
+Register globally:
+
+```
+Vue.component('hello', {});
+```
+
+Allows me to create a new component which I can reuse in **all my other** Vue **Instances**, and their **templates**. 
+
+Vue component arguments:
+
+* 1st: selector of the component
+* 2nd: js object similar to the one we pass in the Vue Instance
+
+Now, in any template, I can add:
+
+```
+<hello></hello>
+<hello></hello>
+```
+
+VueJS, replaces any ```<hello></hello>``` with the template in the component.
+
+## Limitations of some Templates
+
+Instance template limitations:
+
+* It's a string, can't write multiline
+* No syntax highlighting
+
+There are 2 versions of VueJS
+
+* Has a compiler built in, supports our templates. Has to respect the DOM and it's limitations, like case insensitive names of elements
+* Re compiled version
+
+## How VueJS Updates the DOM
