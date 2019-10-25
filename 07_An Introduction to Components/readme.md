@@ -163,3 +163,42 @@ new Vue({
 })
 
 ```
+
+## How to Name your Component Tags (Selectors)
+
+Pretty common:
+
+```
+components: {
+	'app-header': Header
+}
+```
+
+and in the template
+```
+<app-header></app-header>
+```
+
+because that resembles the normal html tags
+
+not very common to use appHeader: Header
+or just appHeader (es6 => appHeader: appHeader)
+
+## Scoping Component Styles
+
+If I'm not scoping the styles one (e.g. div) style will apply to all elements, not only to the component
+
+**Scoping Styles** => **Contained in the component**
+
+To scope styles, add:
+
+```
+<style scoped>
+</style>
+```
+
+Behind the scenes, it uses the **shadow DOM!**
+
+Not only 1 DOM, but subDOMS!
+
+
