@@ -73,3 +73,93 @@ this.status will refer to this instance of Vue Component
 [Example](https://codepen.io/ioanmeri/pen/YzzVZQr)
 
 ## The "Root Component" in the App.vue File
+
+## Creating a Component
+
+## Using Components
+
+I want to render 5 times a component at Home Page.
+
+**process**
+
+**ServerStatus.vue**
+```
+<template>
+	<div>
+		<p>Server Status: {{ status }}</p>
+		<hr>
+		<button @click="changeStatus">Change Status</button>
+	</div>
+</template>
+
+<script>
+	export default {
+		data: function(){
+			return {
+				status: 'Critical'
+			}
+		},
+		methods: {
+			changeStatus(){
+				this.status = 'Normal';
+			}
+		}
+	}
+</script>
+
+<style>
+
+</style>
+```
+
+**Home.vue**
+```
+<template>
+	<div>
+		<app-server-status v-for="server in 5"></app-server-status>
+	</div>
+</template>
+
+<script>
+	import ServerStatus from './ServerStatus.vue';
+
+	export default {
+		components: {
+			'app-server-status': ServerStatus
+		}
+	}
+</script>
+
+<style>
+	
+</style>
+```
+
+**App.vue**
+```
+<template>
+  <app-servers></app-servers>
+</template>
+
+<script>
+</script>
+
+<style>
+
+</style>
+```
+
+**main.js**
+```
+import Vue from 'vue'
+import App from './App.vue'
+import Home from './Home.vue';
+
+Vue.component('app-servers', Home);
+
+new Vue({
+  el: '#app',
+  render: h => h(App)
+})
+
+```
