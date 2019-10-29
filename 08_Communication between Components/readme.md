@@ -382,3 +382,95 @@ Imagine communicaton between components at 2nd level:
 * to Parent -> another child -> **child**
 
 It can get **too complicated using events**
+
+
+### Using an Event Bus for Communication
+Using a central object to pass the data (Angular 2 = services)
+
+#### main.js
+New Vue object at main file. No need to declare methods.. they already exist 
+
+```
+export const eventBus = new Vue();
+
+new Vue()...
+```
+
+### Child 2
+I want to emit the same data, but not to this Vue instance, instead in the eventBus Instance
+
+```
+<script>
+import { eventBus } from '../main';
+
+export default {
+	props: ...,
+	methods: {
+		editAge(){
+			this.userAge = 30;
+//			this.$emit('ageWasEdited', this.userAge);
+			eventBus.$emit('ageWasEdited', this.userAge);
+		}
+	}
+}
+</script>
+```
+
+### Child 1
+New LifeCycle Hook: **created**
+
+Set up a listener to this event. This listener should keep running, from the begginning of this component
+
+```
+<script>
+	import { eventBus } from '../main';
+
+	export default {
+		props: {},
+			methods: {},
+			created(){
+				eventBus.$on('ageWasEdited', (age) => {
+					this.userAge = age;
+				});
+			}
+	}
+</script>
+```
+
+eventBus.$on() will now listen to events emmited on this view Instance (eventBus stored in main.js)
+
+#### Important
+
+The Age doesn't change in the Parent component. Only in 2 children components
+
+> For small to medium size applications, there is nothing wrong with this approach
+
+
+### Centralizing Code in an Event Bus
+If you don't want to duplicate code, but store it centrally.
+
+Accessible from anywhere, as long as you import it..Or access data properties
+```
+export const eventBus = new Vue({
+	data: {
+
+	},
+	methods: {
+		changeAge(age){
+			this.$emit('ageWasEdited', age);
+		}
+	}
+});
+
+```
+
+## Assignment 7: Component Communication
+We loop through all components created with v-for
+and pass the current index to this server
+
+Loop Through all these servers, 
+create a new component for the list item, 
+pass the id - status to that, 
+be able to click this component. 
+And then load the server in the server details 
+where we have a button to change the status back to normal
