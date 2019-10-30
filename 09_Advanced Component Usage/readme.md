@@ -152,6 +152,13 @@ By default, the component dies
 </keep-alive>
 ```
 
+### Dynamic Component Lifecyle Hooks
+
+#### What if we wanted to react to navigating away ?
+
+2 lifecycle hooks to control, if dynamic component is currently visited
+* Component activated
+* Component de-activated
 
 
 
