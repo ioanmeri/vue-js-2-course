@@ -262,3 +262,321 @@ Animate the element at on page load
 </script>
 ```
 
+## Multiple Elements
+
+Once an element is removed, you start animating another one
+
+You need to key them with **key property**. Give each element a unique key
+
+```
+<transition :name="alertAnimation">
+  <div class="alert alert-info" v-if="show" key="info">This is some Info</div>
+  <div class="alert alert-warning" v-else key="warning">This is some Warning</div>
+</transition>
+```
+
+**Important**: v-show will not work
+
+* can use v-if and v-else
+* or v-if and v-if with reversed condition
+
+### Mode
+Add **mode** attribute:
+
+#### out-in
+
+Let the old element animate out first & then animate the new one
+```
+<transition :name="alertAnimation" mode="out-in">
+  <div class="alert alert-info" v-if="show" key="info">This is some Info</div>
+  <div class="alert alert-warning" v-else key="warning">This is some Warning</div>
+</transition>
+```
+
+#### in-out 
+Does the opposite
+
+## Transition JS Hooks
+The transition element emits some event at certain points of time. We can listen to these events to execute our own JS code
+
+### Hooks
+```
+---------------------> Element ----------------->
+```
+
+* before-enter
+* enter
+* after-enter
+* after-enter-cancelled
+
+* before-leave
+* leave
+* after-leave
+* after-leave-cancelled
+
+## Animations in Javascript
+
+### Understanding JavaScript Animations
+```
+<transition 
+    @before-enter="beforeEnter"
+    @enter="enter"
+    @after-enter="afterEnter"
+    @enter-cancelled="enterCancelled"
+
+    @before-leave="beforeLeave"
+    @leave="leave"
+    @after-leave="afterLeave"
+    @leave-cancelled="leaveCancelled">
+  <div style="width: 100px; height: 100px; background-color: lightgreen" v-if="load"></div>
+</transition>
+
+
+script
+
+    methods: {
+      beforeEnter(el){
+        console.log('beforeEnter');
+      },
+      enter(el, done){
+        console.log('enter');
+        done();
+      },
+      afterEnter(el){
+        console.log('afterEnter');
+      },
+      enterCancelled(el){
+        console.log('enterCancelled');
+      },
+      beforeLeave(el){
+        console.log('beforeLeave');
+      },
+      leave(el, done){
+        console.log('leave');
+        done();
+      },
+      afterLeave(el){
+        console.log('afterLeave');
+      },
+      leaveCancelled(el){
+        console.log('leaveCancelled');
+      }
+    }
+  }
+```
+
+### Exculding CSS from your Animation
+
+***:css="false"**
+
+Means don't look for CSS classes, we don't use them. Immediately execute the hooks.
+
+```
+<transition 
+    @before-enter="beforeEnter"
+    @enter="enter"
+    @after-enter="afterEnter"
+    @enter-cancelled="enterCancelled"
+
+    @before-leave="beforeLeave"
+    @leave="leave"
+    @after-leave="afterLeave"
+    @leave-cancelled="leaveCancelled"
+    :css="false">
+  <div style="width: 100px; height: 100px; background-color: lightgreen" v-if="load"></div>
+</transition>
+```
+
+### Creating an Animation in Javascript
+
+The place to animate is the **enter** and **leave** function. These are the functions that get executed after the initial stage have been set
+
+Animation of width:
+
+```
+    methods: {
+      beforeEnter(el){
+        console.log('beforeEnter');
+        this.elementWidth = 100;
+        el.style.width = this.elementWidth + 'px';
+      },
+      enter(el, done){
+        console.log('enter');
+        let round = 1;
+        const interval = setInterval(() => {
+          el.style.width = (this.elementWidth + round*10) + 'px';
+          round++;
+          if(round > 20){
+            clearInterval(interval);
+            done();
+          }
+        }, 20);
+      },
+      afterEnter(el){
+        console.log('afterEnter');
+      },
+      enterCancelled(el){
+        console.log('enterCancelled');
+      },
+      beforeLeave(el){
+        console.log('beforeLeave');
+        this.elementWidth = 300;
+        el.style.width = this.elementWidth + 'px';
+      },
+      leave(el, done){
+        console.log('leave');
+        let round = 1;
+        const interval = setInterval(() => {
+          el.style.width = (this.elementWidth - round*10) + 'px';
+          round++;
+          if(round > 20){
+            clearInterval(interval);
+            done();
+          }
+        }, 20);
+      },
+      afterLeave(el){
+        console.log('afterLeave');
+      },
+      leaveCancelled(el){
+        console.log('leaveCancelled');
+      }
+    }
+```
+
+## Animating Dynamic Components
+```
+<button class="btn btn-primary"
+    @click="selectedComponent === 'app-success-alert' ? selectedComponent = 'app-danger-alert' : selectedComponent = 'app-success-alert'">Toggle Components</button>
+<br><br>
+<transition name="fade" mode="out-in">
+  <component :is="selectedComponent"></component>
+</transition>
+
+script
+  import DangerAlert from './DangerAlert.vue';
+  import SuccessAlert from './SuccessAlert.vue';	
+
+    data() {
+      return {
+        selectedComponent: 'app-success-alert'
+      }
+    },
+```
+
+## Multiple Elements / Lists
+
+* Animate the removal of an Item
+* Animate the addition of an Item
+
+
+You don't need to add any new CSS classes to animate. It works just like transitions, so you can use the same Classes.
+
+**Important**:
+
+One important Difference:
+
+```
+<transition>
+```
+is not rendered to the DOM!
+
+```
+<transition-group> does render a new HTML Tag!
+```
+
+By Default, that will be a ```<span>```, you can ovewrite this by setting:
+```
+<transition-gropup tag="TAG">
+```
+
+### Key the items
+In order to let VueJS know which element is which, you have to key the list items.
+
+```
+<ul class="list-group">
+  <transition-group name="slide">
+    <li 
+          class="list-group-item" 
+          v-for="(number, index) in numbers" 
+          @click="removeItem(index)"
+          style="cursor: pointer"
+          :key="number">{{ number }}</li>
+  </transition-group>
+</ul>
+
+
+script
+    data() {
+      return {
+        numbers: [1, 2, 3, 4, 5]
+      }
+    },
+
+      addItem(){
+        const pos = Math.floor(Math.random() * this.numbers.length);
+        this.numbers.splice(pos, 0, this.numbers.length + 1);
+      },
+      removeItem(index){
+        this.numbers.splice(index, 1);
+      }
+
+```
+
+### slide-move
+
+Because when an element is added or removed, the space created/removed is not animated. 
+The whole page jumps.
+
+Transition Group gives us access to a new Class, 
+
+#### Solution
+**slide-move** is attached to any **element which needs to change it's place**. 
+
+For example: 
+
+* a new element was added. Another element, therefore, needs to change it's place, because it needs to move down
+* deleting an element. Another element needs to move up
+
+```
+.slide-move {
+  transition: transform 1s;
+}
+
+  .slide-enter {
+    opacity: 0;
+    /*transform: translateY(20px);*/
+  }
+
+  .slide-enter-active {
+    animation: slide-in 1s ease-out forwards;
+    transition: opacity .5s;
+  }
+
+  .slide-leave {
+    
+  }
+
+  .slide-leave-active {
+    animation: slide-out 1s ease-out forwards;
+    transition: opacity 1s;
+    opacity: 0;
+    position: absolute;
+  }
+
+  .slide-move {
+    transition: transform 1s;
+  }
+
+
+```
+
+VueJS will animate elements behind the scene.
+
+#### Wrap Up
+Whenever the transform property is changed, animate it over 1s
+
+
+
+
+
