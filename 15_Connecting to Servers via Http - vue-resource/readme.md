@@ -143,5 +143,150 @@ Vue.http.options.root = 'https://vuejs-http-b2402.firebaseio.com/data.json';
 
 In the app, set an empty string
 
+## Intercepting
+
+### Requests
+vue-resource allow us to set up such interceptors, which are executed uppon each request or response very easily.
+
+**Example** in main.js:
+
+```
+Vue.http.options.root = 'https://vuejs-http-b2402.firebaseio.com/data.json';
+Vue.http.interceptors.push((request, next) => {
+	console.log(request);
+	if(request.method == 'POST'){
+		request.method = 'PUT';
+	}
+	next();
+});
+```
+
+On Firebase the difference between **PUT** and **POST** is that 
+
+* POST creates new resources (that's why we need the unique identifier), 
+* while PUT always overrides the old data
+
+### Response
+
+Example of overriding the response function of vue-resource with interceptors:
+```
+Vue.http.interceptors.push((request, next) => {
+	console.log(request);
+	if(request.method == 'POST'){
+		request.method = 'PUT';
+	}
+	next(response => {
+		response.json = () => {return {messages: response.body} }
+	});
+});
+```
+
+## Where the "resource" in vue-resource Comes From
+vue-resource allows us to set up our "own" resources, which are kind of nice mappings of common tasks to http requests. 
+e.g.: a **save** method on your data and then that would automatically execute the POST request
+
+Set up some flexible pieces of functions we can then reuse in our application. 
+
+**main.js**: The root url changed to
+```
+Vue.http.options.root = 'https://vuejs-http-b2402.firebaseio.com/';
+```
+
+save is the vue-resource default method for POST request
+
+```
+script
+
+methods
+			submit(){
+				// this.$http.post('data.json', this.user)
+				// 		.then(response => {
+				// 			console.log(response)
+				// 		}, error => {
+				// 			console.log(error);
+				// 		});
+				this.resource.save({}, this.user);
+			},
+
+		created(){
+
+			this.resource = this.$resource('data.json');
+		}
+```
+
+## Creating Custom Resources
+
+Highest degreee of flexibility without having to hardcode everything over and over again, if you reuse the same resource twice.
+
+```
+			submit(){
+				this.resource.saveAlt(this.user);
+			},
+
+		created(){
+			const customActions = {
+				saveAlt: {method: 'POST', url: 'alternative.json'}
+			};
+			this.resource = this.$resource('data.json', {}, customActions);
+		}
+```
+
+## Understanding Template URLs
+To make data.json have a dynamic name we can use url templates
+
+
+
+```
+<input type="text" class="form-control" v-model="node">
+
+
+data(){
+	return {
+		node: 'data'
+	}
+},
+
+
+methods
+
+			fetchData(){
+				// this.$http.get('data.json')
+				// 		.then(response => {
+				// 			return response.json()
+				// 			console.log(data);
+				// 		})
+				// 		.then(data => {
+				// 			const resultArray = [];
+				// 			for(let key in data){
+				// 				resultArray.push(data[key]);
+				// 			}
+				// 			this.users = resultArray;
+				// 		});
+				this.resource.getData({node: this.node})
+						.then(response => {
+							return response.json()
+							console.log(data);
+						})
+						.then(data => {
+							const resultArray = [];
+							for(let key in data){
+								resultArray.push(data[key]);
+							}
+							this.users = resultArray;
+						});
+			}
+
+
+
+		created(){
+			const customActions = {
+				saveAlt: {method: 'POST', url: 'alternative.json'},
+				getData: {method: 'GET'}
+			};
+			this.resource = this.$resource('{node}.json', {}, customActions);
+		}
+
+```
+
 
 
