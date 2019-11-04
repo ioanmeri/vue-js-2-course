@@ -295,5 +295,226 @@ script
     },
 ```
 
+## Nested Routes
+
+More realistic to have a **list of users** we can choose from, not hardcoded ids, and **click them**
+
+### Setting Up Nested Routes
+
+* All **other User Components**: UserDetail, UserEdit, UserStart **should be nested inside the User** component
+
+* I want to have **sub-routes** in our User component so that we can load different components inside there
+
+If child path starts with **/**, then the path is **absolute**, else it is relative to parent. 
+
+```
+export const routes = [
+  { path: '', component: Home},
+  { path: '/user', component: User, children: [
+    {path: '', component: UserStart },
+    {path: ':id', component: UserDetail },
+    {path: ':id/edit', component: UserEdit },
+  ]},
+];
+```
+
+Children components won't be rendered in router-view
+**Router-view** in App.vue is the **Root Router**
+
+#### New Router View in User.vue
+```
+<router-view></router-view>
+```
+
+### Navigating to Nested Routes
+I want to be able to click a list item, and load the appropriate User Detail Component and pass the parameter to it
+
+**UserStart.vue**
+```
+<router-link 
+  tag="li" 
+  to="/user/1"
+  class="list-group-item" 
+  style="cursor: pointer">User 1</router-link>
+```
+
+**UserDetail.vue**
+```
+<p>User Loaded has ID: {{ $route.params.id }}</p>
+```
+
+## Dynamic Routes
+
+### Making Router Links more Dynamic
+```
+<router-link 
+    tag="button" 
+    :to="'/user/' + $route.params.id + '/edit'"
+    class="btn btn-primary">Edit User</router-link>
+```
+
+### Named Routes - A Better Way of Creating Links
+Assign names to the route:
+**routes.js**
+```
+export const routes = [
+  { path: '', component: Home},
+  { path: '/user', component: User, children: [
+    {path: '', component: UserStart },
+    {path: ':id', component: UserDetail },
+    {path: ':id/edit', component: UserEdit, name: 'userEdit' },
+  ]},
+];
+```
+VueJS will automatically populate this real path
+
+```
+<router-link 
+    tag="button" 
+    :to="{ name: 'userEdit', params: { id: $route.params.id } }"
+    class="btn btn-primary">Edit User</router-link>
+```
+
+## Using Query Parameters
+Optional data you pass with a route:
+
+/?a=100&b=hello
+
+2 ways:
+
+* String syntax: to="/?a=100&b=hello"
+* Object syntax: :to="{name: '', params: {}, query: { locale: 'en', q: 100 } }"
+  * set up key: value pairs where you set your parameters
+
+
+## Multiple Router View (Named Router Views)
+Named router views make it easy for you to reserve certain spots in your layout, in your html code, to dynamically render pieces of your application there, depending on which route you navigating to..
+
+Header appears in **Home Page** at **top**
+in **User page** at **bottom**
+
+### Load multiple components
+
+**routes.js**
+```
+import Header from './components/Header.vue';
+
+export const routes = [
+  { path: '', name: 'home', components: {
+    default: Home,
+    'header-top': Header
+  } },
+  { path: '/user', components: {
+    default: User,
+    'header-bottom': Header
+  }, children: [
+    {path: '', component: UserStart },
+    {path: ':id', component: UserDetail },
+    {path: ':id/edit', component: UserEdit, name: 'userEdit' },
+  ]},
+];
+```
+
+**App.vue**
+```
+<router-view name="header-top"></router-view>
+<router-view></router-view>
+<router-view name="header-bottom"></router-view>
+```
+
+## Redirecting
+What if the user enters anything which is not covered by the App: **/something**
+
+We want to **redirect**:
+
+```
+export const routes = [
+  { path: '/redirect-me', redirect: '/user' }
+
+  or
+
+  { path: '/redirect-me', redirect: { name: 'home' } }
+]
+```
+
+### Setting Up "Catch All" Routes / Wildcards
+
+Everything that it is not handled by other routes, is now catched by the star route, which in this case redirects to home page.
+
+```
+{ path: '*', redirect: '/' }
+```
+
+## Animating Route Transitions
+
+Wrap the router-view which you want to animate with transition and then set up the transition as learned
+```
+<transition name="slide" mode="out-in">
+  <router-view></router-view>
+</transition>
+```
+
+with name, with class
+
+## Passing the Hash Fragment
+To navigate at specific part of the page with '#'
+
+We want to control, where the page scrolls when we navigate
+
+```
+template
+
+<router-link 
+    tag="button" 
+    :to="link"
+    class="btn btn-primary">Edit User</router-link>
+
+script
+    data(){
+      return {
+        link: { 
+          name: 'userEdit', 
+          params: { 
+            id: this.$route.params.id 
+          },
+          query: { 
+            locale: 'en', 
+            q: 100 
+          },
+          hash: '#data' 
+        }
+      }
+    }
+```
+But it dosn't scroll at the bottom..
+
+### Controlling the Scroll Behavior
+Really Simple in VueJS
+
+**main.js**
+```
+const router = new VueRouter({
+  routes,
+  mode: 'history',
+  scrollBehavior(to, from, savedPosition){
+    return {x: 0, y: 0};
+  }
+});
+```
+
+**Fine scroll Behavior:**
+
+```
+  scrollBehavior(to, from, savedPosition){
+    if(savedPosition){
+      return savedPosition;
+    }
+    if(to.hash){
+      return { selector: to.hash };
+    }
+    return {x: 0, y: 0};
+  }
+```
+
 
 
