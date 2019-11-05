@@ -511,5 +511,198 @@ To pass multiple propeties to dispatcher: **use an object**
 		}
 ```
 
+## Two-Way-Binding(v-model) and Vuex
 
+If we have a two way binded property in Component binded with a state property via a computed getter, then v-model does not work, because computed is only a setter.
 
+```
+<input type="text" v-model="value">
+<p>{{ value }}</p>
+
+computed: {
+  value(){
+    return this.$store.getters.value;
+  }
+},
+```
+
+How can we fix this?
+
+We **rarely use** computed properties to set values. Here is needed though.
+
+```
+    computed: {
+      value: {
+        get(){
+          return this.$store.getters.value;
+        },
+        set(value){
+          this.$store.dispatch('updateValue', value);
+        }
+      }
+    },
+```
+
+## Modules
+
+### Improving Folder Structures
+
+We want to structure all our VueJS related code (store.js file) with different files. Something we want to do for bigger applications. 
+
+Because this file with all getters, mutations and actions will grow pretty quick
+
+1
+
+create /store/**modules**/ folder
+
+### Modularizing the State Management
+
+Would be nice to separate this store.js file into two different modules where each module has it's own getters, mutations state and so on.
+
+#### Counter related code
+
+**/moduels/counter.js**
+
+```
+const state = {};
+const setters = {};
+const mutations = {};
+const actions = {};
+
+export default {
+	state,
+	getters,
+	mutations,
+	actions
+}
+````
+
+To import that code into **Central State store.js**:
+
+```
+import counter from './modules/counter';
+
+Vue.use(Vuex);
+
+export const store = new Vuex.Store({
+	modules: {
+		counter
+	}
+})
+```
+
+## Using Separate Files
+
+Sometimes you have some actions, getters, setters which don't belong to one module.
+
+Create a file in /store folder: **actions.js**
+1
+
+```
+export const updateValue = ({commit}, payload) => {
+	commit('updateValue', payload);
+};
+```
+
+2
+
+and import * as actions in **store.js**:
+
+```
+import * as actions from './actions.js';
+```
+
+3 use the whole actions object as actions:
+
+```
+export const store = new Vuex.Store({
+	actions
+})
+```
+
+The same for mutations and actions
+
+**Refactored store.js**
+```
+import Vue from 'vue';
+import Vuex from 'vuex';
+import counter from './modules/counter';
+
+import * as actions from './actions.js';
+import * as mutations from './mutations.js';
+import * as getters from './getters.js';
+
+Vue.use(Vuex);
+
+export const store = new Vuex.Store({
+	state: {
+		value: 0
+	},
+	getters,
+	mutations,
+	actions,
+	modules: {
+		counter
+	}
+});
+
+```
+
+## Using Namespaces to Avoid Naming Problems
+
+If you are using multiple modules, you have to be sure you are not using the same name twice.
+
+All the things here are merged into a central store. Hence, they share the same namespace.
+
+All **getters, actions, mutations have a unique name**, in all the files which in the end get merged together in the store
+
+For large applications:
+
+1
+
+Create file /store/**types.js**
+```
+export const DOUBLE_COUNTER = 'counter/DOUBLE_COUNTER';
+export const CLICK_COUNTER = 'counter/CLICK_COUNTER';
+```
+
+2
+
+**store/modules/counter.js**
+
+```
+import * as types from '../types';
+
+const getters = {
+	[types.DOUBLE_COUNTER]: state => {
+		return state.counter * 2;
+	},
+	[types.CLICK_COUNTER]: state => {
+		return state.counter + ' Clicks';
+	}
+};
+
+```
+
+3
+
+import types everywhere you use: **AnotherResult.vue**:
+
+```
+script
+
+	import * as types from '../stores/types';
+
+		computed: {
+			...mapGetters({
+				doubleCounter: types.DOUBLE_COUNTER,
+				stringCounter: types.CLICK_COUNTER,
+			})	
+		}
+```
+
+We are using the types file to manage all global getters names. You can do the same for actions and mutations. Now string names are unique because we prefix them with module names.
+
+## Auto-namespacing with Vuex 2.1
+
+If you're using Vuex version 2.1 or higher, you may use its auto-namespacing feature to avoid having to set up all the namespaces manually. You may learn more about it here: https://github.com/vuejs/vuex/releases/tag/v2.1.0
