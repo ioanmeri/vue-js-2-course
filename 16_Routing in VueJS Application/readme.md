@@ -516,5 +516,178 @@ const router = new VueRouter({
   }
 ```
 
+## Guards
+
+### Protecting Routes with Guards
+
+You wanna control, if a **user is allowed to enter a certain route** or he is allow to leave it
+
+2 checks:
+
+* **Before** a User enters a Route
+* Once he wants to **leave** a Route
+
+**3 places** where we can set up: is a User **allowed to enter** a Route **check**. 
+
+**1 place** is allowed to **leave check**
+
+### Using the "beforeEnter" Guard
+
+#### 1st Place: Global
+
+**main.js**
+
+```
+router.beforeEach((to, from, next) => {
+  console.log('global beforeEach');
+  next();
+});
+```
+_If you **don't add next()**, it is assumed that is not allowed to continue and it **will exit**_
+
+##### 3 options for next()
+* Pass **nothing**
+* Pass false, it will **abort**
+* Pass either a path, or an object defining that path (inc. params etc) to **redirect**
+
+#### 2nd Place: Protect certain routes (more common)
+**routes.js**
+
+beforeEnter method in route setup, directly limited to this route
+
+```
+export const routes = [
+  { path: '', name: 'home', components: {
+    default: Home,
+    'header-top': Header
+  } },
+  { path: '/user', components: {
+    default: User,
+    'header-bottom': Header
+  }, children: [
+    {path: '', component: UserStart },
+    {path: ':id', component: UserDetail, beforeEnter: (to, from, next)  => {
+      console.log('inside route setup');
+      next();
+    } },
+    {path: ':id/edit', component: UserEdit, name: 'userEdit' },
+  ]},
+  { path: '/redirect-me', redirect: { name: 'home' } },
+  { path: '*', redirect: '/' }
+];
+```
+#### 3rd Place: Component Instance
+
+2 new methods available: beforeRouteEnter()
+
+**Important**: As long as you **don't call next()**, this **component** is **not loaded**. So you can't access your Vue Instance, or data.. **this.link will not work**. Object hasn't fully initialized.
+
+If you want to access the Component Instance:
+``
+next(vm => {
+  vm.link;
+});
+``
+
+```
+beforeRouteEnter(to, from, next){
+  if(true){ //authenticated
+    next();
+  }else{
+    next(false); // abort
+  }
+}
+```
+
+### Using the "beforeLeave" Guard
+
+The only place I can add the beforeLeave is in the Component.
+Typical set up when you want to ensure that user does not navigate away be accintentally clicking the back button or something like this.
+
+**UserEdit.vue**
+```
+template
+  <button class="btn btn-primary" @click="confirmed = true">Confirm</button>
+
+
+<script>
+  export default {
+    data(){
+      return {
+        confirmed: false
+      }
+    },
+    beforeRouteLeave(to, from, next){
+      if(this.confirmed){
+        next();
+      }else{
+        if(confirm('Are you sure?')){
+          next();
+        }else{
+          next(false);
+        }
+      }
+    }
+  }
+</script>
+```
+
+## Loading Routes Lazily
+Advanced topic that can really improve your applications
+
+It might be unnecessary to load all the components, at the beginning of the application.
+
+If we bundle everything with webpack, into one file. That has the disadvantage that while limiting the number of HTTP requests you send, you might limited too much because the bundle there is really big. So, you want to find the right balance having a big bungle and loading staff you only need when you need them.
+
+We can do this with webpack
+
+**Lazy load**: We only load parts of the application when we need it.
+
+Right now it loads eagerly (all the time). All the **imports** at the top of **routes.js** are loaded no matter if you use it or not..
+
+**routes.js**
+```
+import Home from './components/Home.vue';
+import Header from './components/Header.vue';
+
+const User = resolve => {
+  require.ensure(['./components/user/User.vue'], () => {
+    resolve(require('./components/user/User.vue'));
+  }, 'user');
+};  
+
+const UserStart = resolve => {
+  require.ensure(['./components/user/UserStart.vue'], () => {
+    resolve(require('./components/user/UserStart.vue'));
+  }, 'user');
+};  
+
+const UserEdit = resolve => {
+  require.ensure(['./components/user/UserEdit.vue'], () => {
+    resolve(require('./components/user/UserEdit.vue'));
+  }, 'user');
+};  
+
+const UserDetail = resolve => {
+  require.ensure(['./components/user/UserDetail.vue'], () => {
+    resolve(require('./components/user/UserDetail.vue'));
+  }, 'user');
+};  
+
+```
+
+User function is a syntax that webpack recognises. Whenever we want to load somethings that lives in this place _./components/user/User.vue_ execute the resolve function, which is like a Promise. It resolves the path you want to really use.
+
+Async function that has to resolve before it gets executed. Webpack is only doing this if we actually need that file. It will create appropriate bundles to be loaded at this point of time during the build process
+
+if you want to bundle a group of components, add the 3rd argument 'user'
+
+
+
+
+
+
+
+
 
 

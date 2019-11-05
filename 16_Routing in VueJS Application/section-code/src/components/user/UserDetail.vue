@@ -25,6 +25,13 @@
 					hash: '#data'	
 				}
 			}
+		},
+		beforeRouteEnter(to, from, next){
+			if(true){ //authenticated
+				next();
+			}else{
+				next(false); // abort
+			}
 		}
 	}
 </script>
