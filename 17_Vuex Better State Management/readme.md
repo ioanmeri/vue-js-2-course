@@ -261,3 +261,255 @@ Include preset in **.babelrc**
 		}
 	}
 ```
+
+## Mutations
+
+### Understanding Mutations
+
+Mutations == Setters
+
+Using Mutations to **Change the State**. We **commit** such mutation from one point of our application, or from one component and this will update the State. 
+
+All the **Components** listening with **getters** will **automatically recieve the updated state**  
+
+### Using Mutations
+
+**store.js**:
+
+```
+export const store = new Vuex.Store({
+	state: {
+		counter: 0
+	},
+	getters: {
+		doubleCounter: state => {
+			return state.counter * 2;
+		},
+		stringCounter: state => {
+			return state.counter + ' Clicks';
+		}
+	},
+	mutations: {
+		increment: state => {
+			state.counter++;
+		},
+		decrement: state => {
+			state.counter--;
+		}
+	}
+});
+```
+
+**Counter.vue & AnotherCounter.vue**
+```
+<template>
+  <div>
+    <button class="btn btn-primary" @click="increment">Increment</button>
+    <button class="btn btn-primary" @click="decrement">Decrement</button>
+  </div>
+</template>
+
+<script>
+  export default {
+    methods: {
+      increment() {
+        this.$store.commit('increment');
+      },
+      decrement() {
+        this.$store.commit('decrement');
+      }
+    }
+  }
+</script>
+```
+
+Again, would be better if we somehow map the mutations like getters. It works exactly as map getters work.
+
+**Shorter & Better Syntax with map**
+
+Map mutation helper method
+
+```
+<script>
+  import { mapMutations } from 'vuex';
+
+  export default {
+    methods: {
+      ...mapMutations([
+          'increment',
+          'decrement'
+        ])
+    }
+  }
+</script>
+```
+gives us easy access to these functions
+
+### Why Mutations have to run Synchronously
+Mutations face a big issue: they always have to be **synchronous**
+
+You must not run any **async** task in such a mutation. 
+
+The benefit of knowning when state changes, get lost, because if something happens asynchronously, **you can't track which mutation is responsible for which change**. 
+
+State might change, and then change again from another mutation which was actually started first but happened to be asynchronous and just took longer than a in between mutation that was synchronous.
+
+You can't tell if the order of changes matches the order of mutations
+
+How we compbine both? async tasks with mutations
+
+## Actions
+
+Action is an extra function where we may run asynchronous tasks
+
+### How Actions Improve Mutations
+
+* dispatch from a Component
+* commit the mutation when the async task is done - only then do we change the state in our store
+
+### Using Actions 
+
+**Context**: We have access to store in general - not all features - like commit and getters.
+
+**store.js**
+```
+	actions: {
+		increment: context => {
+
+			context.commit('increment');
+		}
+	}
+```
+Or desctrure only commit method from context
+
+```
+	actions: {
+		increment: ({ commit }) => {
+			commit('increment');
+		},
+		decrement: ({ commit }) => {
+			commit('decrement');
+		},
+		asyncIncrement: ({ commit }) => {
+			setTimeout(() => {
+				commit('increment');
+			}, 1000);
+		},
+		asyncDecrement: ({ commit }) => {
+			setTimeout(() => {
+				commit('decrement');
+			}, 1000);
+		}
+	}
+```
+
+You might consider **using only actions** even if you don't use any async tasks, just to have that clear pattern that you always dispatch actions and not sometimes directly commit a mutation to a component and sometimes dispatch an action.
+
+I **don't want to use mutation directly**. Instead use actions, although you only need to do if for only async tasks.
+
+**AnotherCounter.vue use Actions**:
+
+```
+<script>
+  import { mapActions } from 'vuex';
+
+  export default {
+    methods: {
+      ...mapActions([
+          'increment',
+          'decrement'
+        ])
+    }
+  }
+</script>
+```
+
+### Mapping Actions to Methods
+
+Behind the scenes:
+
+What mapActions 
+```
+methods: {
+  ...mapActions([
+      'increment',
+      'decrement'
+    ])
+}
+```
+
+is this:
+
+```
+methods: {
+	increment(){
+		this.$store.dispatch('increment');
+	}
+}
+```
+
+can also pass **argument**:
+
+```
+methods: {
+	increment(by){
+		this.$store.dispatch('increment', by);
+	}
+}
+```
+**mapActions** thankfully creates the method in such a way, that we are **able** to **pass** on 
+**argument automatically**
+
+#### Process: How to Pass Payload
+
+1 **Counter.vue** 
+
+```
+<button class="btn btn-primary" @click="increment(100)">Increment</button>
+```
+
+2 **store.js** add payload
+```
+	mutations: {
+		increment: (state, payload) => {
+			state.counter += payload;
+		},
+
+	actions: {
+		increment: ({ commit }, payload) => {
+			commit('increment', payload);
+		},
+```
+#### Multiple properties
+
+To pass multiple propeties to dispatcher: **use an object**
+
+```
+ <button class="btn btn-primary" @click="asyncIncrement({by: 50, duration: 500})">Increment</button>
+
+    methods: {
+      ...mapActions([
+          'asyncIncrement',
+          'asyncDecrement'
+        ])
+    }
+
+```
+
+**store.js**:
+
+```
+		asyncIncrement: ({ commit }, payload) => {
+			setTimeout(() => {
+				commit('increment', payload.by);
+			}, payload.duration);
+		},
+		asyncDecrement: ({ commit } , payload) => {
+			setTimeout(() => {
+				commit('decrement', payload.by);
+			}, payload.duration);
+		}
+```
+
+
+
