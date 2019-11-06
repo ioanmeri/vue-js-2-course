@@ -429,3 +429,40 @@ Use it in both **Header** and **Home**
 Changing stock prices now, is reflected in all components. That's the benefit of using a centrilized state
 
 > Animating the Route Transitions
+
+> Http functionalities
+
+```
+npm install --save vue-resource
+```
+
+Import in **main.js**:
+
+```
+import VueResource from 'vue-resource';
+
+Vue.use(VueResource);
+```
+
+[Firebase console](https://console.firebase.google.com/)
+
+new project
+
+create database
+
+change to realtime database
+
+* read, write true to everyone 
+* copy db url
+
+> Save Data functionality PUT request
+
+> Load Data functionality GET request
+
+Also add src/store/**actions.js** file for global state actions with
+**loadData()** action
+
+& SET_PORTFOLIO mutation
+
+because it influences both states: portfolio and stocks
+
