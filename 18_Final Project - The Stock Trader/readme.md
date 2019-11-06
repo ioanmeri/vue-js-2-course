@@ -394,3 +394,38 @@ That's why it is better to use capital letters for mutations.
 > Work on portfolio/Stock.vue
 
 cp code from stocks/Stock.vue, quite similar template
+
+> Add Home Component and funds from state
+
+```
+template
+    <p>Your Funds: {{ funds }}</p>
+
+    computed: {
+      funds(){
+        return this.$store.getters.funds;
+      }
+    }
+```
+
+> Display funds in Home and Navbar
+
+> Add Checks for not selling or buying more stocks than we can afford
+
+> Make funds Look Nicer with filters
+
+Global filter in **main.js**:
+
+```
+Vue.filter('currency', (value) => {
+  return '$' + value.toLocaleString();
+});
+```
+
+Use it in both **Header** and **Home**
+
+> Randomize Stocks with End Day Button
+
+Changing stock prices now, is reflected in all components. That's the benefit of using a centrilized state
+
+> Animating the Route Transitions
