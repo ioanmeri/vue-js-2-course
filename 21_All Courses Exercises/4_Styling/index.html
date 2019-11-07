@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Vue Exercises - Styling</title>
+  <meta name="description" content="Vue Exercises - Styling">
+  <meta name="author" content="Ioannis Merianos">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://npmcdn.com/vue/dist/vue.js"></script>
+</head>
+
+<body>
+  
+  <div id="exercise">
+    <h4>1) Start the Effect with the Button. The Effect should alternate the "highlight" or "shrink" class on each new setInterval tick (attach respective class to the div with id "effect" below)</h4>
+    <div>
+      <button @click="startEffect">Start Effect</button>
+      <br><br>
+      <div id="effect" :class="{shrink: shrink, highlight: highlight}"></div>
+    </div>
+    <hr>
+    <h4>2) Create a couple of CSS classes and attach them via the array syntax</h4>
+    <div :class="[attachClass1, attachClass2]">I got classes with array syntax :)</div>
+    <hr>
+    <h4>3) Let the user enter a class (create some example classes) and attach it</h4>
+    <div>
+      <ul>
+        <li>attachClass1</li>
+        <li>attachClass2</li>
+      </ul>
+      <input type="text" v-model="userClass">
+      <div :class="userClass"></div>
+    </div>
+    <hr>
+    <h4>4) Let the user enter a class and enter true/ false for another class (create some example classes) and attach the classes</h4>
+    <ul>
+      <li>User Class: userClass</li>
+      <li>enter <strong>true</strong> for <strong>pink</strong> background</li>
+    </ul>
+    <div>
+      <input type="text" v-model="userClass">
+      <input type="text" v-model="anotherClassBool">
+      <br><br>
+      <div :class="[userClass, anotherClass]"></div>
+    </div>
+    <hr>
+    <h4>Repeat 3) but now with values for styles (instead of class names). Attach the respective styles.</h4>
+    <div>
+      <label>
+        <p>Background Color:</p>
+        <input type="text" v-model="userBackgroundColor">
+      </label>
+      <br><br>
+      <div class="userClass" :style="{backgroundColor: userBackgroundColor}"></div>
+    </div>
+    <hr>
+    <!-- 6) Create a simple progress bar with setInterval and style bindings. Start it by hitting the below button. -->
+    <div>
+      <h3>Progress Bar</h3>
+      <button @click="startProgressBar">Start Progress</button>
+      <div class="bar" :style="{width: computeBarWidth + 'px'}"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

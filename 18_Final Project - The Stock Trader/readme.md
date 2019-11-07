@@ -464,5 +464,5 @@ Also add src/store/**actions.js** file for global state actions with
 
 & SET_PORTFOLIO mutation
 
-because it influences both states: portfolio and stocks
+loadData() is a global action because it influences both states: portfolio and stocks
 
