@@ -69,9 +69,6 @@
 </template>
 
 <script>
-  import axios from '../../axios-auth';
-  import keys from '../../../keys'
-
   export default {
     data () {
       return {
@@ -106,13 +103,7 @@
           terms: this.terms
         }
         console.log(formData)
-        axios.post('accounts:signUp?key=' + keys.VUE_APP_FIREBASE_KEY, {
-          email: formData.email,
-          password: formData.password,
-          returnSecureToken: true
-        })
-          .then(res => console.log(res))
-          .catch(error => console.log(error))
+        this.$store.dispatch('signup', formData)
       }
     }
   }

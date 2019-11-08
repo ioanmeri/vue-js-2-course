@@ -68,3 +68,70 @@ Remove custom authorization headers from previous section
 
 
 ### Adding User Signin (Login)
+
+Firebase endpoint for: Sign in with email /password
+
+```
+https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=[API_KEY]
+```
+
+## Store token
+
+### Using Vuex to send Auth Requests
+
+The goal is to store the token in vuex store. The **store is** already **injected** in the **main.js** file
+
+* Pass **post request** into an **action** because we should be able to handle the result of our requests in the vuex store. 
+
+* dispatch an action from signup component
+
+**signup.vue**
+```
+  this.$store.dispatch('signup', {
+    email: formData.email,
+    password: formData.password,
+  })
+```
+
+**store.js**
+```
+actions: {
+  signup({commit}, authData){
+    axios.post('accounts:signUp?key=' + keys.VUE_APP_FIREBASE_KEY, {
+      email: authData.email,
+      password: authData.password,
+      returnSecureToken: true
+    })
+      .then(res => console.log(res))
+      .catch(error => console.log(error))
+  },
+```
+
+We lose our state, if we reload the page plus the authUser token and userId.It's only stored in JS and that is lost if we reload
+
+## Attach token to outgoing requests
+
+Be careful of the axios Instances we use. 
+
+```
+import globalAxios from 'axios';
+```
+
+globalAxios will be used for storing and fetching Data.
+
+### Process
+
+**Sign Page**
+
+* SignUp Component onSubmit: dispatch signUp with **all Form Data**
+* Action signUp: axios Post with only needed data for Firebase signup
+  * then => commit mutation authUser (token, userId)
+  * and => dispatch storeUser with authData(all Form Data)
+* Action storeUser: globalAxios post to store all Form Data
+
+
+**Dashboard Page**
+
+* onCreate dispatch fetchUser
+* Action fetch User: globalAxios post
+  * commit mutation storeUser (the first user)
