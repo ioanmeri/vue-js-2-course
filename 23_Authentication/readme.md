@@ -109,6 +109,8 @@ actions: {
 
 We lose our state, if we reload the page plus the authUser token and userId.It's only stored in JS and that is lost if we reload
 
+Needs refactoring
+
 ## Attach token to outgoing requests
 
 Be careful of the axios Instances we use. 
@@ -135,3 +137,85 @@ globalAxios will be used for storing and fetching Data.
 * onCreate dispatch fetchUser
 * Action fetch User: globalAxios post
   * commit mutation storeUser (the first user)
+
+### Authorize ourselfs
+* Extract Token from the State
+* Append to the request
+
+Some Backends requires an authorization header which contains the token, Firebase needs to pass an additional query param: '?auth='
+
+Now we need that because Firebase rules allows only authorized users to read and write:
+
+```
+if(!state.idToken){
+  return
+}
+globalAxios.get('/users.json' + '?auth=' + state.idToken, userData)
+```
+
+## Protecting Routes (Auth Guards)
+Navigation guard:
+
+with beforeEnter and by accessing the store there
+
+**routes.js**:
+
+import store Instance as the Instance I access in my components with **$store**
+
+```
+import store from './store'
+
+
+const routes = [
+  { path: '/', component: WelcomePage },
+  { path: '/signup', component: SignupPage },
+  { path: '/signin', component: SigninPage },
+  { 
+    path: '/dashboard', 
+    component: DashboardPage,
+    beforeEnter(to, from, next){
+      if(store.state.idToken){
+        next()
+      }else{
+        next('/signin')
+      }
+    } 
+  }
+]
+```
+
+## Updating the UI State (based on Authentication State)
+
+ Show navigation links depending if user is authenticated.
+
+ **store.js**: Add isAuthenticated getter
+
+ ```
+ isAuthenticated (state){
+  return state.idToken !== null
+}
+ ```
+
+**header.vue**
+
+```
+template
+<li v-if="!auth">
+  <router-link to="/signup">Sign Up</router-link>
+</li>
+<li v-if="!auth">
+  <router-link to="/signin">Sign In</router-link>
+</li>
+<li v-if="auth">
+  <router-link to="/dashboard">Dashboard</router-link>
+</li>
+
+script
+  export default {
+    computed: {
+      auth () {
+        return this.$store.getters.isAuthenticated;
+      }
+    }
+  }
+```
