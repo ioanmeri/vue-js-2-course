@@ -328,4 +328,96 @@ login({commit, dispatch}, authData){
 
 ```
 
+## Adding Auto Login
 
+If I reload the page, I am still logged in
+
+Store the token somewhere else, instead of vuex store. 
+
+Because vuex store, of course, is JS and therefore is lost just like all the other data in JS is, on page reloads.
+
+
+### Store expiresIn and token
+
+Use a **broswer API: localStorage** which allows us to store key-value pairs in a percistent browser storage
+
+Both **signup** and **login**
+
+Store the Date the token becomes invalid, not the amount of seconds.
+```
+const now = new Date()
+const expirationData = new Date(now.getTime() + res.data.expiresIn * 1000)
+
+localStorage.setItem('token', res.data.idToken)
+localStorage.setItem('expiresIn', expirationData)
+```
+
+### Ispect local Storage
+Chrome Developer Tools > Local Storage > Expand
+
+We see the items we got in the Local Storage
+
+* token (value)
+* expiresIn
+
+
+### Extract 
+
+At some **point of time** to automatically log the user in
+
+* at application startup
+
+First add action tryAutoLogin()
+  * see if I have a valid token at local storage
+
+```
+tryAutoLogin({commit}){
+  const token = localStorage.getItem('token')
+  if(!token){
+    return
+  }
+  const expirationDate = localStorage.getItem('expirationDate')
+  const now = new Date()
+  if(now >= expirationDate){
+    return
+  }
+  const userId = localStorage.getItem('userId')
+  commit('authUser', {
+    token: token,
+    userId: userId
+  })
+},
+
+```
+
+**App.vue** (Root Component):
+```
+created(){
+  this.$store.dispatch('tryAutoLogin')
+}
+```
+
+
+#### Also clear localStorage Data
+**store.js**:
+
+```
+logout({commit}){
+  commit('clearAuthData')
+  localStorage.removeItem('expirationDate');
+  localStorage.removeItem('token');
+  localStorage.removeItem('userId');
+  router.replace('/signin')
+},
+```
+
+## Wrap Up
+
+Features typical to User Authentication:
+
+* token which we fetch when signup/login
+* store token in both vuex and more precistent localstorage
+* auto logout
+* auto login
+* UI that takes authentication status into account
+  * blocking access to Dashboard if not authenticated
