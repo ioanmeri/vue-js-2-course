@@ -219,3 +219,113 @@ script
     }
   }
 ```
+
+## User Logout
+
+### Logout Action
+
+**header.js**: Dispatch Action
+
+```
+template
+  <li v-if="auth">
+    <button class="logout" @click="onLogout">Logout</button>
+  </li>
+
+script
+      methods: {
+      onLogout(){
+        this.$store.dispatch('logout')
+      }
+    }
+```
+
+**store.js**: Add Action and mutation
+```
+  mutations: {
+    clearAuthData(state){
+      state.idToken = null
+      state.userId = null
+    }
+  },
+
+  actions: {
+    logout({commit}){
+      commit('clearAuthData')
+    },
+
+```
+
+### Navigate away
+
+Better than push, use **replace**
+
+* replace the current route, so we can't go back
+
+**store.js**:
+
+```
+import router from './router'
+
+
+logout({commit}){
+  commit('clearAuthData')
+  router.replace('/signin')
+},
+
+```
+
+One big **flaw** that app still has, is that we can always **logout**, if we **reload** the app. That might not be the desired result, because the user looses his session (token). Additionaly, the token is only valid for 1 hour.
+
+## Auto Logout
+
+If a token expired, because the user stayed in the app for more that a hour. He is automatically logged out
+
+Firebase gives us a **refresh token**, that **never expires**. You can send that to a specific endpoint, that you can find in the documentation
+
+Get a New id Token
+
+[API: Exchange a refresh token for an ID token](https://firebase.google.com/docs/reference/rest/auth#section-refresh-token)
+
+```
+https://securetoken.googleapis.com/v1/token?key=[API_KEY]
+```
+
+Theoretically, create **infinite session**. A bit less secure because refresh token is valid forever, anyone with that token can generate id Tokens. Of course, is not that easy to get the refresh token though. 
+
+You store it in local storage and there you can only access it with XSS, which Vue prevents by default. So less secure, but not insecure.
+
+Refresh token won't be used here.
+
+### Auto Logout after 1h
+
+#### Add action setLogoutTimer
+
+**store.js**:
+
+```
+actions
+
+setLogoutTimer({commit, dispatch}, expirationTime){
+  setTimeout(() => {
+    commit('clearAuthData')
+  }, expirationTime*1000)
+},
+
+signup({commit, dispatch}, authData){
+  axios.post('accounts:signUp?key=' + keys.VUE_APP_FIREBASE_KEY, {
+    .then(res => {
+      dispatch('setLogoutTimer', res.data.expiresIn)
+    })
+},
+
+
+login({commit, dispatch}, authData){
+  axios.post('accounts:signInWithPassword?key=' + keys.VUE_APP_FIREBASE_KEY, {
+  })
+      dispatch('setLogoutTimer', res.data.expiresIn)
+},
+
+```
+
+

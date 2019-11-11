@@ -4,6 +4,8 @@ import axios from './axios-auth';
 import keys from '../keys'
 import globalAxios from 'axios';
 
+import router from './router'
+
 Vue.use(Vuex)
 
 export default new Vuex.Store({
@@ -19,9 +21,18 @@ export default new Vuex.Store({
     },
     storeUser(state, user){
       state.user = user;
+    },
+    clearAuthData(state){
+      state.idToken = null
+      state.userId = null
     }
   },
   actions: {
+    setLogoutTimer({commit, dispatch}, expirationTime){
+      setTimeout(() => {
+        commit('clearAuthData')
+      }, expirationTime*1000)
+    },
     signup({commit, dispatch}, authData){
       console.log(authData)
       axios.post('accounts:signUp?key=' + keys.VUE_APP_FIREBASE_KEY, {
@@ -36,10 +47,11 @@ export default new Vuex.Store({
             userId: res.data.localId
           })
           dispatch('storeUser', authData)
+          dispatch('setLogoutTimer', res.data.expiresIn)
         })
         .catch(error => console.log(error))
     },
-    login({commit}, authData){
+    login({commit, dispatch}, authData){
       axios.post('accounts:signInWithPassword?key=' + keys.VUE_APP_FIREBASE_KEY, {
         email: authData.email,
         password: authData.password,
@@ -50,9 +62,14 @@ export default new Vuex.Store({
           commit('authUser', {
             token: res.data.idToken,
             userId: res.data.localId
-          })
+          });
+          dispatch('setLogoutTimer', res.data.expiresIn)
         })
         .catch(error => console.log(error))
+    },
+    logout({commit}){
+      commit('clearAuthData')
+      router.replace('/signin')
     },
     storeUser({commit, state}, userData){
       if(!state.idToken){
