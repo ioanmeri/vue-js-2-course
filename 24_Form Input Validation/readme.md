@@ -112,3 +112,47 @@ Other useful properties vuelidator gives us:
 * $invalid: if invalide
 * $dirty: if touched
 * $error: invalid + dirty
+
+## Adding Validation in UI Feedback
+
+Add invalid class if user has a chance to edit the value:
+
+```
+template
+  <div class="input" :class="{invalid: $v.email.$error}">
+    
+    <p v-if="$v.email.email">Please provide a valid email address.</p>
+  </div>
+
+style
+  .input.invalid label {
+    color: red;
+  }
+
+  .input.invalid input {
+    border: 1px solid red;
+    background-color: #ffc9aa;
+  }
+
+If I complete to a valid value, styles are gone
+```
+
+### Controlling Styles for Invalid Entries
+
+You can fire the validator when input loses focus == Better UX
+
+```
+<div class="input"  :class="{invalid: $v.email.$error}">
+  <label for="email">Mail</label>
+  <input
+          type="email"
+          id="email"
+          @blur="$v.email.$touch()"
+          v-model="email">
+  <p v-if="!$v.email.email">Please provide a valid email address.</p>
+  <p v-if="!$v.email.required"> This field must not be empty</p>
+</div>
+```
+
+You can also **connect $touch to a button**
+
