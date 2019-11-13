@@ -16,9 +16,9 @@ Includes things like:
 npm install --save vuelidate
 ```
 
-## Adding a Validator
+## Email Validator
 
-### Email
+### Email shoud be
 * Not Empty
 * Valid Email Address
 
@@ -156,3 +156,37 @@ You can fire the validator when input loses focus == Better UX
 
 You can also **connect $touch to a button**
 
+
+## Age Validation
+
+Accept only people that are 18 years old
+
+Add **age validator** (must named age, because we are binding age with v-model)
+
+Validators used:
+
+* **numeric** => checks if value is a number
+
+* **minValue** => allows us to check if a numeric or Date Value is higher than a specific value you enter
+
+Unlike, required and numeric, **minValue** is a function. You can also access the function **$params**
+
+
+```
+template
+  <div class="input" :class="{invalid: $v.age.$error}">
+    <input
+            type="number"
+            id="age"
+            @blur="$v.age.$touch()"
+            v-model.number="age">
+    <p v-if="!$v.age.minVal">You have to be at least {{ $v.age.$params.minVal.min }} years old.</p> 
+script
+  validations: {
+    age: {
+      required,
+      numeric,
+      minVal: minValue(18)
+    }
+  }
+```
