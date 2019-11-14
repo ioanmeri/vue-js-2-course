@@ -222,7 +222,7 @@ template
 script
 
   import { required, email, numeric, minValue, minLength, sameAs } from 'vuelidate/lib/validators'
-  
+
     validations: {
       password: {
         required,
@@ -237,3 +237,25 @@ script
     },
 
 ```
+
+## CheckBox Validation
+
+Required to check Terms, unless you picked Germany in a totally different input
+
+```
+  <div class="input inline" :class="{invalid: $v.terms.$error}">
+    <input 
+            type="checkbox" 
+            id="terms" 
+            @change="$v.terms.$touch()"
+            v-model="terms">
+    <label for="terms">Accept Terms of Use</label>
+  </div>
+  validations: {
+    terms: {
+      // customRequired: sameAs(() => true)
+      customRequiredUnless: (value, vm) => vm.country === 'germany' ? true : value
+    }
+  },
+```
+

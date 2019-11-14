@@ -63,8 +63,12 @@
             </div>
           </div>
         </div>
-        <div class="input inline">
-          <input type="checkbox" id="terms" v-model="terms">
+        <div class="input inline" :class="{invalid: $v.terms.$error}">
+          <input 
+                  type="checkbox" 
+                  id="terms" 
+                  @change="$v.terms.$touch()"
+                  v-model="terms">
           <label for="terms">Accept Terms of Use</label>
         </div>
         <div class="submit">
@@ -108,6 +112,10 @@
         sameAs: sameAs(vm => {
           return vm.password
         })
+      },
+      terms: {
+        // customRequired: sameAs(() => true)
+        customRequiredUnless: (value, vm) => vm.country === 'germany' ? true : value
       }
     },
     methods: {
