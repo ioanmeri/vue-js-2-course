@@ -113,7 +113,7 @@ Other useful properties vuelidator gives us:
 * $dirty: if touched
 * $error: invalid + dirty
 
-## Adding Validation in UI Feedback
+### Adding Validation in UI Feedback
 
 Add invalid class if user has a chance to edit the value:
 
@@ -189,4 +189,51 @@ script
       minVal: minValue(18)
     }
   }
+```
+
+## Passwords Equality Validation
+
+* Passwords should be equal
+
+**sameAs** function: You can pass 2 types of data
+
+* a property name of your Vue instance (password)
+* or a callback with vm
+
+```
+template
+  <div class="input" :class="{invalid: $v.password.$error}">
+    <label for="password">Password</label>
+    <input
+            type="password"
+            id="password"
+            @blur="$v.password.$touch"
+            v-model="password">
+  </div>
+  <div class="input" :class="{invalid: $v.confirmPassword.$error}">
+    <label for="confirm-password">Confirm Password</label>
+    <input
+            type="password"
+            id="confirm-password"
+            @blur="$v.confirmPassword.$touch()"
+            v-model="confirmPassword">
+  </div>
+
+script
+
+  import { required, email, numeric, minValue, minLength, sameAs } from 'vuelidate/lib/validators'
+  
+    validations: {
+      password: {
+        required,
+        minLen: minLength(6)
+      },
+      confirmPassword: {
+        // sameAs: sameAs('password')
+        sameAs: sameAs(vm => {
+          return vm.password
+        })
+      }
+    },
+
 ```
