@@ -305,3 +305,13 @@ template
     },
 
 ```
+
+## Controlling Form Submit Button
+
+We want to disable the form submit button if we got any validation errors in our form.
+
+Access $v.error or **$v.invalid**:
+
+```
+<button type="submit" :disabled="$v.$invalid">Submit</button>
+```
