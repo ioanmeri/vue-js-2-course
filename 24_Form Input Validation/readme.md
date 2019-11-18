@@ -335,6 +335,57 @@ validations: {
   },
 ```
 
+### Async Valitor
+
+* Find out if one of the users has an email address, we already registered
+
+
+Example: ** Return a Promise** and Vuelidate is able to automatically handle this
+
+```
+unique: val => {
+  if (val === '') return true;
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve(val !== 'test@test.com')
+    }, 1000)
+  })
+}
+```
+
+### Firebase Search By Email:
+
+Adjust **Firebase** to be able to query the data I want to query: 
+
+```
+{
+  /* Visit https://firebase.google.com/docs/database/security to learn more about security rules. */
+  "rules": {
+    ".read": "true",
+    ".write": "auth != null",
+      "users": {
+        ".indexOn": ["email"]
+      }
+  }
+}
+```
+
+and async db call:
+```
+validations: {
+  email: {
+    required,
+    email,
+    unique: val => {
+      if (val === '') return true;
+      return axios.get('/users.json?orderBy="email"&equalTo="'+val + '"')
+        .then(res => {
+          return Object.keys(res.data).length === 0
+        })
+    }
+  },
+```
+
 
 
 
