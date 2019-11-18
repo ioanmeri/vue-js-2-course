@@ -315,3 +315,29 @@ Access $v.error or **$v.invalid**:
 ```
 <button type="submit" :disabled="$v.$invalid">Submit</button>
 ```
+
+## Async Validation
+
+Example: Reaching out to a server to check whether email address is taken
+
+### Creating Custom Validator
+
+Don't allow test@test.com with custom validator:
+
+```
+validations: {
+  email: {
+    required,
+    email,
+    unique: val => {
+      return val !== 'test@test.com'
+    }
+  },
+```
+
+
+
+
+
+
+
