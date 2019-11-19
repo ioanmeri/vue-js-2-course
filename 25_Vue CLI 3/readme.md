@@ -3,7 +3,7 @@
 To create a new Vue Project:
 
 ```
-vue create
+vue create project-name
 ```
 
 Options:
@@ -28,10 +28,31 @@ npm install -g @vue/cli
 
 Note: You can't run vue init anymore (at least with some change or addition)
 
-Now:
+
+
+### Create a Project
 
 ```
 vue create vue-cli-new
 ```
 
-Choose plugin options from cli. You can save as a template
+Choose plugin options from cli. You can save as a preset. If you want to delete a preset you can remove it from .vuerc file. 
+
+## Analyzing the Created Project
+
+### Package.json
+
+The vue-cli does use webpack under the hood. It basically hides it away in the package.json/devDependencies/@vue/cli-service.
+
+**browsersList**:
+
+Allows you to set up which browsers you wanna support with your project. 
+
+Important for tools like the autoprifixer. The same for babel.
+
+
+### public/manifest.json
+
+Provides metadata about your app which can be read by the browser to make installable in the home screen.
+
+
