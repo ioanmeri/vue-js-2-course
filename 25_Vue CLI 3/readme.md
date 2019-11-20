@@ -56,3 +56,26 @@ Important for tools like the autoprifixer. The same for babel.
 Provides metadata about your app which can be read by the browser to make installable in the home screen.
 
 
+## Using Plugins
+
+Plugins have to follow a certain naming pattern
+
+**vue-cli-plugin-**plugin-name
+
+Official Plugins
+
+* [Vuetify](https://github.com/vuetifyjs/vuetify)
+
+For official plugins you can add them by just type:
+
+```
+_> vue add vuetify
+```
+
+This will:
+
+* install it
+* set it up 
+* run through prompts
+
+Quit and restart server after installing plugins
