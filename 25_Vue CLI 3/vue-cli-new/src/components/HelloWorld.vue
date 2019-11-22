@@ -9,6 +9,10 @@
     <h3>Installed CLI Plugins
       <span>Testing SCSS</span>
     </h3>
+    <h3>
+      Testing Environment Variables
+    </h3>
+    <p>{{ url }}</p>
     <h3>Installed CLI Plugins</h3>
     <ul>
       <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
@@ -38,6 +42,11 @@
 
 <script>
 export default {
+  data () {
+    return {
+      url: process.env.VUE_APP_URL
+    }
+  },
   name: 'HelloWorld',
   props: {
     msg: String

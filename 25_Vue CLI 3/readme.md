@@ -107,3 +107,53 @@ h3 {
   }
 }
 ```
+
+
+## Enviroment Variables
+
+in app root folder, create a file:
+
+> Important: You need to name them VUE_APP_YOURVAR for it to be available in your client side - Vue code.
+
+1.
+
+**.env**
+
+It will be automatically picked up by the CLI and I can store values that I use in my project. 
+
+**Key-value pairs**
+
+2. 
+```
+VUE_APP_URL=https://dev.api.com
+```
+
+You can use it in computed properties, watchers, vuex store and anywhere in the entire project. It's injected everywhere.
+
+3.
+```
+<script>
+export default {
+  data () {
+    return {
+      url: process.env.VUE_APP_URL
+    }
+  },
+</script>
+```
+
+4.
+I need to **restart my dev server** for it to pick up that .env file and take it into account in it's configuration.
+
+### Env Modes
+
+Global configurations automatically managed, handled and set by the Vue-CLI
+
+* Development
+  * .env.developemt will be used during development
+* Test
+  * .env.test
+* Production
+  * .env.production will be used for production builds (npm run build)
+
+
