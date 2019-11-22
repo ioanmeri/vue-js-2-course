@@ -79,3 +79,31 @@ This will:
 * run through prompts
 
 Quit and restart server after installing plugins
+
+
+## CSS Pre-Processors
+
+Install necessary packages 
+
+```
+npm install --save sass-loader node-sass
+```
+
+Troubleshooting on node-sass installation:
+```
+sudo npm install --save-dev  --unsafe-perm node-sass
+```
+
+
+Then in components:
+```
+<style scoped lang="scss">
+
+h3 {
+  margin: 40px 0 0;
+
+  span {
+    color: red;
+  }
+}
+```
